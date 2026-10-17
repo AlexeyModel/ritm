@@ -1,320 +1,202 @@
-# ContractorControl
+# Ritm
 
-**ContractorControl** is a modern **microservices orchestration** platform built on the principles of **Clean Architecture**. It serves as an **event-driven orchestration** system and a **passive registrar** for **business process tracking**, offering a lightweight **BPM alternative** (such as Camunda).
+Scheduled breaks for a working day.
 
-The core of the system relies on a **DAG (Directed Acyclic Graph)** model to ensure a **deterministic process** without cycles. To achieve maximum performance, **state validation** is handled via optimized **stored procedures** on the database side.
+**Document:** product description and operating note  
+**Product version:** 1.1  
+**Language of this document:** English  
+**Language of the program:** Russian
 
-The platform is ideal for high-throughput distributed systems, data pipelines, and strict sequential approvals where process determinism is critical.
+Ritm reminds a person to pause on a chosen interval, but only while a working window is open. A typical use is a break every 45 minutes between 09:00 and 19:00. The reminder is a system sound and a message written for that counter.
 
-### Technology Stack
-* **Backend:** **.NET 10** / **dotnet10**, **C#**, **ASP.NET Core API**
-* **Architecture Patterns:** **MediatR (CQRS library)**
-* **Data Layer:** **PostgreSQL**, **EF Core (Entity Framework Core)**
-* **Deployment & Tools:** **Docker Compose**, **Swagger UI**
+There is no account, no installer, and no shared service. Each copy keeps its own board on the machine where it runs.
 
-### Key Components
-* **Dynamic CRUD:** A universal service for dynamic data management (`insert`, `update`, `delete`).
-* **GenerationCC:** A dedicated **CLI graph generator** for building graph connections.
+## What it is for
 
-## Service documentation
+Ritm is for a person who works to a clock and wants the pause to belong to that clock.
 
-Contract Execution Registration Service for Event-Driven Orchestration of Microservices Based on the DAG (Directed Acyclic Graph) Model (p. 1).
+- The working time is a schedule: a from–until range and the weekdays it applies to.
+- Inside one schedule there can be several counters. Each counter has its own interval, in minutes, and its own message.
+- Outside the schedule the counters do not move. Closing or minimising the window does not stop them.
+- When a counter reaches its interval, the system sound plays and that counter’s message is shown. The count then starts again.
 
----
+The Windows program and the Linux program are meant to stay on the computer through the working day, including from the tray. The browser copy is the same board for a session in that browser. It is not a control panel for the desktop program.
 
-**🚀 1. Launch Instructions and Configuration Parameters**
+## Editions
 
-The application uses HTTP port **6767** by default (AppSettings:Port parameter in the appsettings.json file) (pp. 8, 11). Before starting, a running PostgreSQL 14+ server with the database (default contractordb) is required (p. 8).
+These archives are separate products. They share the same idea. They do not share data.
 
-## **🐧 Launch on Linux**
+| Archive | What it is | Where it runs |
+|---|---|---|
+| `Ritm-tray-windows.zip` | Tray application, version 1.1, ready to run. .NET 9 is already inside. | Windows 10 and Windows 11, 64-bit |
+| `Ritm-tray-source.zip` | Source of that application. Needed only to compile again. | Build machine with the .NET 9 SDK |
+| `Ritm-linux-kde-gnome.zip` | Desktop application for KDE and GNOME. The settings window is a web page. The counters run in the program. | KDE and GNOME, with Python 3 |
+| `Ritm-site-source.zip` | Source of the browser site. This is not the Linux program. | A machine with Node.js 22 |
+| `Ritm-site-build.zip` | The browser site, already built. `npm install` is not required. | A machine with Node.js 22 |
 
-1. Clone the repository:  
-   git clone https://github.com && cd ContractorControl (p. 8)  
-2. Configure the connection string in ContractorControl/appsettings.json (specify your password and Search Path=contractor_control) (p. 8).  
-3. Build and run the project:  
-   cd ContractorControl && dotnet restore && dotnet run (p. 8)  
-4. The service and Swagger UI will be available at: http://localhost:6767 and http://localhost:6767/swagger (p. 9).
+The website does not write settings into the tray application, and the tray application does not read the website. They are two separate copies of the same board.
 
-## **🪟 Launch on Windows**
+- The desktop application keeps its data in a file on the computer.
+- The site keeps its data in the browser where it was opened.
 
-1. Clone the repository and open the solution file ContractorControl.sln in Visual Studio 2022+ (p. 9).  
-2. Configure the connection string in ContractorControl/appsettings.json (p. 9).  
-3. Select ContractorControl as the startup project and press **F5** (or **Ctrl+F5**) (p. 9).  
-4. Alternative launch via developer console: dotnet restore -> dotnet run (p. 9).
+## How a working day is described
 
-## **🐳 Launch in Docker**
+A **schedule** is a time window plus weekdays. Example: 09:00 to 19:00, Monday to Friday.
 
-For deployment, a combination of the .NET 10 application and PostgreSQL DBMS is used (pp. 6, 9). Building and running are done with a single command from the root directory of the solution (pp. 9, 11):
+- If “until” is earlier than “from”, the window crosses midnight.
+- 09:00–00:00 means until midnight.
+- One schedule can hold several counters. The interval of a counter is in minutes.
+- Once a second the program checks every schedule. While the current time is inside the window, enabled counters of that schedule add one second. Outside the window they stay still.
+- When a counter reaches its interval, the sound plays and that counter’s message is shown. The count starts over.
+- **Snooze 5 min** sets the next alert five minutes later.
+- **Reset at the start of the window** starts counters from zero the first time the window is entered on a new day.
+- **Test** shows the message and plays the sound immediately.
+- **Pause** stops every schedule until it is turned off. Pause is not kept after a restart.
 
-docker-compose up --build
+## Data
 
-*Note: When configuring via Docker environment variables/developers, double underscores must be used instead of colons for key hierarchy (e.g., ConnectionStrings__DefaultConnection) (p. 11).*
+Nothing in these editions is sent to an account. There is no sign-in.
 
----
+| Edition | Where the board is kept |
+|---|---|
+| Windows tray application | `%LOCALAPPDATA%\Ritm\ritm.db`, usually `C:\Users\YourName\AppData\Local\Ritm\ritm.db` |
+| KDE and GNOME application | `~/.local/share/ritm/ritm.db` |
+| Browser site | the browser, `localStorage` key `ritm-v1` |
 
-**📊 2. Database Structure (Schema contractor_control)**
+On Windows, **Data folder** opens the folder above. `error.log` is written there if a tick fails.
 
-All tables are automatically initialized in the contractor_control schema on first launch (pp. 11-12). The system implements a soft-delete pattern at the ORM level through the IAuditable interface (columns create_at, update_at, delete_at) (pp. 7, 12).
+To start the Windows program from an empty database, quit from the icon menu and delete `ritm.db`. The next start creates a new database.
 
-## **Main Tables and Relationships (pp. 12-16):**
+Another browser, another computer, or clearing site data starts the browser board over. Nothing from the site is written into the tray application’s file. Linux data is separate from Windows data.
 
-* **contracts** — registry of business processes (contract templates). Key fields: id (SERIAL, PK), code (VARCHAR, unique process code) (p. 12).  
-* **state_type** — directory of state types (p. 12). Contains 4 system hardcoded types (Seed data):  
-  1. GLOBAL (system status, set without graph validation) (pp. 13, 17)  
-  2. RUN (process execution stage) (p. 13)  
-  3. SUCCESS (successful completion of the stage) (p. 13)  
-  4. FAILED (error at the execution stage) (p. 13)  
-* **states** — DAG graph nodes linked to a specific contract (p. 13). System statuses FINISHED (id=1), FAILED (id=2) and QUEUE (id=3) are reserved and linked to a dummy contract with contract_id = 0 (p. 14).  
-* **dags** — graph edges defining transitions (links) between states (p. 14). Fields: state_source_id (outgoing) and state_destination_id (incoming) (p. 14).  
-* **contract_execution** — instances of contract executions (p. 14). Stores an external unique identifier instance_contract_execution (UUID/GUID) for integration with external microservices (p. 15).  
-* **events** — immutable log (journal) of achieved states (p. 15). Unique index (contract_execution_id, state_id, delete_at) prevents re-recording of the same state for a specific instance (p. 15).
+## What this set does not do
 
-**Relationships (Entity Relationships):**  
-contracts (1) ----------- (*) states (*) ----------- (1) state_type
+- It does not synchronise the website, the Windows program, and the Linux program.
+- It does not keep Pause after a restart.
+- It does not install itself. The Windows build is unpacked and run. The file is not signed. Windows may ask whether an unrecognised application is trusted. That is normal for this build.
+- It does not open a second copy of the Windows program. If it is already running, a message says Ritm is already running and the icon is by the clock.
+- It does not provide an English interface. Menus and checks use the Russian labels named below.
 
-   |                            |  
-   |                            +--- (*) dags (*) --- (1) states (self-reference)  
-   |  
-(1) ----------- (*) contract_execution (1) ----------- (*) events (*) ----------- (1) states
+## 1. Tray application
 
----
+Archive: `Ritm-tray-windows.zip`.
 
-**📂 3. Project File Structure**
+1. Unpack the archive into a folder, for example `C:\Ritm`. Unpack the whole folder. `Ritm.exe` must stay next to the dll files. `Ritm.exe` alone, pulled out of the archive, will not start. Do not run the program from inside the archive window.
+2. Run `Ritm.exe`. There is no installer.
+3. The close button and minimise hide the window in the tray by the clock. The counters keep running. If the icon is not visible, open the arrow **Show hidden icons** by the clock.
+4. Quit only from the icon menu: right-click, then **Exit**. Closing the window does not quit the program.
 
-The project is developed in accordance with the principles of Clean Architecture and is divided into two main executable entities within a single .sln file (p. 18):
+### Autostart
 
-```
-ContractorControl.sln
-├── ContractorControl/                # Main web application (ASP.NET Core API)
-│   ├── Api/                          # Controllers (ContractExecution, States, Crud, Init) and Middleware
-│   ├── Application/                  # Business logic layer: CQRS (Commands, Queries, Handlers, FluentValidators)
-│   │                                   and embedded SQL scripts for stored procedures
-│   ├── Domain/                       # DB entities (Contract, State, Event, Dag), common interfaces (IAuditable)
-│   └── Infrastructure/               # EF Core settings, ApplicationDbContext, interceptors (Interceptors)
-│                                       and initialization services (InitService, CrudService)
-└── GenerationCC/                     # Console application for generating graph connections (DAG)
-    ├── Program.cs                    # Entry point for parser and CLI logic
-    └── GenerationCC.csproj           # Configuration file for the generator project
-```
+The check **Автозапуск при входе в Windows** is in two places:
 
----
+- the window menu, under **Окно**;
+- the tray icon menu, on a right-click.
 
-**⚙️ 4. API Business Logic and Event Architecture**
+When the mark is on, Windows starts Ritm in the tray at login and does not open the window. When the mark is off, the startup entry is removed.
 
-**ContractorControl** acts as a **passive event registrar** (pp. 6, 28). It does not actively manage token transit, but only verifies the correctness of task execution facts sent by microservices (pp. 6, 28).
+Registry: `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, value name `Ritm`.
 
-## **Key API Endpoints (pp. 22-23):**
+## 2. Build the tray application from source
 
-1. **POST api/ContractExecution/create** — creation of a new contract execution instance by its code, returns an external GUID (instance_contract_execution) (pp. 15, 22).  
-2. **POST api/States/setStates** — registration of an event (transition to a new state) (p. 22). Includes the DAG validation algorithm (p. 22).  
-3. **POST api/States/checkStateToSet** — preliminary check: is it allowed to set this state now (p. 22).  
-4. **POST api/ContractExecution/checkIsFinished** — check for completion of the entire contract (p. 22).  
-5. **POST api/crud/[insert|update|delete]** — universal dynamic CRUD service operating through reflection for metadata management (requires SecretKey transmission) (pp. 23, 25).
+Archive: `Ritm-tray-source.zip`. This is not required for normal use. The ready build is `Ritm-tray-windows.zip`.
 
-## **Logic for Working with States and Global Statuses:**
+The .NET 9 SDK is required, not only the runtime: [https://dotnet.microsoft.com/download/dotnet/9.0](https://dotnet.microsoft.com/download/dotnet/9.0)
 
-* **Transition Validation**: When attempting to set a state of type RUN, SUCCESS, or FAILED, the system searches for all incoming edges in the dags table (pp. 13, 24). The transition is allowed only when **all** parent nodes (predecessors) already have confirming records in the events table (p. 24).  
-* **Global Statuses**: If the state type is defined as GLOBAL (e.g., FINISHED, FAILED, QUEUE), graph validation is completely ignored, allowing recording of a system failure or forced process termination at any time (pp. 7, 27).  
-* **Global Context**: To ensure maximum performance, validation is moved to the PostgreSQL DBMS side in the form of two optimized stored procedures (check_state_to_set and check_is_finished), called through the CQRS layer (MediatR library) (pp. 7, 16, 23).
+Unpack the archive, open that folder in a terminal, and run:
 
----
-
-**🔀 5. Architectural Differences from Camunda BPM Class Systems**
-
-The project offers an alternative approach to automating inter-service interaction (p. 29).
-
-| Comparison Criterion                  | Camunda (BPMN Approach)                                      | ContractorControl (DAG Approach)                                      |
-| :------------------------------------ | :----------------------------------------------------------- | :-------------------------------------------------------------------- |
-| **Role in Architecture**              | **Active Orchestrator**. Independently moves the process, manages tokens, calls external services (pp. 29-30). | **Passive Registrar**. Accepts facts from autonomous microservices and validates their order (pp. 6, 29-30). |
-| **Mathematical Model**                | BPMN 2.0. Allows cycles, gateways, complex conditional branches, and subprocesses (pp. 29-30). | **DAG (Directed Acyclic Graph)**. Cycles are impossible at the schema level (pp. 6, 26, 30). |
-| **Execution Guarantees**              | Requires configuration of compensations, timeouts, and error handlers at the engine level (pp. 29-30). | **Determinism**. The absence of cycles mathematically guarantees process completability (pp. 26, 29). |
-| **Complexity and Speed**              | High resource intensity, complex UI (Cockpit, Modeler), long learning curve (pp. 29-30). | Lightweight, high performance due to checks at the PostgreSQL function level (p. 30). |
-
-**When to Choose ContractorControl:** The project is ideal for systems whose business logic can be described as a strict sequence or parallel chains of steps without going back (Data Pipelines, approval chains, distributed transactions in EDA) (pp. 26, 29, 31).
-
----
-
-**🛠️ 6. Second Application: Graph Generator Module (GenerationCC)**
-
-GenerationCC is a console utility on .NET 10 designed to automate filling the dags connection table based on text configurations (pp. 7, 32). It works directly through the Npgsql driver within a single transaction to ensure atomicity (pp. 32, 34).
-
-## **Operating Principle:**
-
-The developer describes the transition tree structure in a text file, using **indents (spaces)** to indicate the hierarchy of parent and child nodes (p. 32). The generator parses the file line by line using a stack algorithm, matches names with the states directory in the DB, and links them with edges (pp. 32-33). If some state is not in the DB, the utility writes a log to a file in the format errors_YYYY-MM-DD.log (p. 34).
-
-## **CLI Invocation Command:**
-
-```bash
-dotnet run --project GenerationCC -- "<ConnectionString>" <ContractId> "<FilePath>"
+```text
+dotnet run --project Ritm.Check
+dotnet publish Ritm.App\Ritm.App.csproj -c Release -r win-x64 --self-contained true -o publish
 ```
 
-*Example:* 
-```bash
-dotnet run --project GenerationCC -- "Host=localhost;Database=contractordb;Username=postgres;Password=secret" 42 "my_dag.txt" (p. 34)
+On macOS or Linux use forward slashes:
+
+```text
+dotnet publish Ritm.App/Ritm.App.csproj -c Release -r win-x64 --self-contained true -o publish
 ```
 
-## **Example Input File (my_dag.txt) (p. 33):**
+The first command checks the clock and the schedule windows. The second writes the program into the `publish` folder. Run `publish\Ritm.exe`. `Ritm-tray-windows.zip` was produced by that same command.
 
-```
-OrderReceived-GLOBAL
-  CheckInventory-RUN
-    InventorySuccess-SUCCESS
-    InventoryFailed-FAILED
-  ReserveItems-RUN
-    ReserveSuccess-SUCCESS
-  ProcessPayment-RUN
-    PaymentSuccess-SUCCESS
-    PaymentFailed-FAILED
-  ShipOrder-RUN
-    ShippingConfirmed-SUCCESS
-OrderCompleted-GLOBAL
-```
+`Ritm.exe` runs only on Windows 10/11, 64-bit. The publish command can be run on Linux or macOS if the .NET 9 SDK is installed: the project sets `EnableWindowsTargeting`. The resulting exe still has to be copied to Windows.
 
-This file will automatically generate the following directed edges in the dags table (p. 33):
+## 3. Website from source
 
-* OrderReceived -> CheckInventory, ReserveItems, ProcessPayment, ShipOrder (p. 33)  
-* CheckInventory -> InventorySuccess, InventoryFailed (p. 33)  
-* ReserveItems -> ReserveSuccess (p. 33)  
-* ProcessPayment -> PaymentSuccess, PaymentFailed (p. 33)  
-* ShipOrder -> ShippingConfirmed (p. 33)
+Archive: `Ritm-site-source.zip`.
 
----
+Node.js 22 is required: [https://nodejs.org/](https://nodejs.org/)
 
-**Next Steps**
+1. Unpack the archive.
+2. In that folder run:
 
-What will be our next step? I can prepare detailed **SQL migration scripts** for manual population of directories or provide examples of **JSON payloads for integrating** your microservices with the setStates endpoints.
-
-# ContractorControl API Integration Payloads
-
-This document provides complete JSON payload examples for integrating your distributed microservices with the **ContractorControl** API endpoints.
-
----
-
-## 1. Create a Contract Execution Instance
-Called at the very beginning of a business process (e.g., by an API Gateway or Order Service) to initialize the flow and obtain a unique tracking GUID.
-
-*   **Method**: `POST`
-*   **Endpoint**: `api/ContractExecution/create`
-*   **Input DTO**: `ContractExecutionCreateDto`
-
-### Request Body
-```json
-{
-  "Code": "order_processing"
-}
+```text
+npm install
+npm run dev
 ```
 
-### Expected Response (`InstanceDto`)
-```json
-{
-  "status": 200,
-  "message": "Execution instance created successfully.",
-  "data": {
-    "InstanceContractExecution": "e1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d"
-  }
-}
-```
-> **Note:** This generated GUID must be passed down to all subsequent microservices via event broker headers or request payloads to keep track of the process execution.
+3. Open [http://localhost:8080](http://localhost:8080) in a browser.
 
----
+Stop the server with Ctrl+C in that terminal.
 
-## 2. Register an Event (State Transition)
-Called by each microservice as soon as it finishes its specific task. The system runs the DAG validation algorithm to ensure all preceding steps have been completed before appending this event to the journal.
+To build the site again from this same folder:
 
-*   **Method**: `POST`
-*   **Endpoint**: `api/States/setStates`
-*   **Input DTO**: `SetStateDto`
-
-### Example A: Registering a standard processing stage (e.g., Inventory Service)
-```json
-{
-  "InstanceContractExecution": "e1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
-  "StateName": "CheckInventory",
-  "StateType": "RUN"
-}
+```text
+npm run build
 ```
 
-### Example B: Registering a successful state completion (e.g., Payment Service)
-```json
-{
-  "InstanceContractExecution": "e1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
-  "StateName": "PaymentSuccess",
-  "StateType": "SUCCESS"
-}
+The built folder is `.vercel/output` (`.vercel\output` on Windows). It is easier to use the ready archive `Ritm-site-build.zip`.
+
+## 4. Website, already built
+
+Archive: `Ritm-site-build.zip`.
+
+Node.js 22 is required. `npm install` is not required.
+
+Windows: unpack the archive and run `start.cmd`.
+
+macOS and Linux: unpack the archive and, in that folder, run:
+
+```text
+sh start.sh
 ```
 
----
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000). Stop the server with Ctrl+C in the window where it is running.
 
-## 3. Pre-check: Can a State Be Set? (Predicate Check)
-Used when a microservice wants to check with ContractorControl whether its prerequisites in the DAG graph are met before starting heavy background or database processing.
+Another port, Windows (`cmd`):
 
-*   **Method**: `POST`
-*   **Endpoint**: `api/States/checkStateToSet`
-*   **Input DTO**: `CheckStateDto`
-
-### Request Body
-```json
-{
-  "InstanceContractExecution": "e1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
-  "StateName": "ShipOrder",
-  "StateType": "RUN"
-}
+```text
+set PORT=8080
+start.cmd
 ```
 
-### Expected Response (`ApiResponse`)
-```json
-{
-  "status": 200,
-  "message": "Success",
-  "data": true
-}
+macOS and Linux:
+
+```text
+PORT=8080 sh start.sh
 ```
 
----
+The server listens only on this computer (`127.0.0.1`). Schedules stay in the browser, not in the build folder.
 
-## 4. Verification: Is the Contract Finished?
-Used by polling clients, monitoring dashboards, or notification services to verify if the contract execution instance has successfully reached the `FINISHED` global milestone.
+## 5. KDE and GNOME application
 
-*   **Method**: `POST`
-*   **Endpoint**: `api/ContractExecution/checkIsFinished`
-*   **Input DTO**: `InstanceDto`
+Archive: `Ritm-linux-kde-gnome.zip`.
 
-### Request Body
-```json
-{
-  "InstanceContractExecution": "e1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d"
-}
+This is a separate program, not the Windows file. Counters, schedules, sound, and messages work the same way. The settings window is the web desk of this program. If Chrome, Chromium, Edge, or Brave is installed, it opens as its own browser window. Otherwise it opens in the default browser through `xdg-open`.
+
+Python 3 is required. Most KDE and GNOME systems already have it.
+
+1. Unpack the archive.
+2. Start it with `sh start.sh` or `python3 ritm.py`.
+3. The window is the schedule board. Closing the window does not stop the counters.
+4. Quit from the tray menu **Выход**, or from the **Выход** button in the window.
+5. The **Автозапуск при входе** check is in the window and in the tray menu. It writes `~/.config/autostart/ritm.desktop`. Both GNOME and KDE read that file.
+
+The tray icon appears when PyGObject is installed:
+
+```text
+sudo apt install python3-gi gir1.2-ayatanaappindicator3-0.1
 ```
 
----
+Without those packages there is no tray icon, but the window, counters, sound, and notifications still work. Notifications use `notify-send` (GNOME and KDE). The sound is the system `dialog-warning`.
 
-## 5. Administrative Configuration (Generic Reflection-based CRUD)
-Payloads used by administrators to modify process topology dynamically via the `CrudController`. This maps properties directly to database columns and requires a secure application key.
-
-*   **Method**: `POST`
-*   **Endpoints**: `api/crud/insert`, `api/crud/update`, `api/crud/delete`
-*   **Input Container Model**: `SetPropertyInfo`
-
-### Example A: Creating a new transition dependency (DAG Edge) between two states
-```json
-{
-  "TableName": "dags",
-  "SecretKey": "SuperSecretKey123",
-  "Data": {
-    "state_source_id": 12,
-    "state_destination_id": 15
-  }
-}
-```
-
-### Example B: Adding a brand new contract template code to the registry
-```json
-{
-  "TableName": "contracts",
-  "SecretKey": "SuperSecretKey123",
-  "Data": {
-    "code": "vendor_delivery"
-  }
-}
-```
-
+Starting the program again does not create a second copy. It opens the window.
