@@ -4,8 +4,6 @@ Scheduled breaks for a working day.
 
 **Document:** product description and operating note  
 **Product version:** 1.1  
-**Language of this document:** English  
-**Language of the program:** Russian
 
 Ritm reminds a person to pause on a chosen interval, but only while a working window is open. A typical use is a break every 45 minutes between 09:00 and 19:00. The reminder is a system sound and a message written for that counter.
 
