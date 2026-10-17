@@ -248,4 +248,3 @@ For the mask `0011111` (Mon–Fri) and Thursday `0001000`: `0011111 & 0001000 = 
 It is done this way because in SQLite the days are one integer field, not seven rows. Turning a day on or off is `mask ^= (1 << i)`: XOR flips exactly that bit and does not touch the others.
 
 A zero mask means “no days selected”, and `Contains` returns `false` immediately. For a window that crosses midnight, the bit is taken from yesterday if the current time is still the “tail” of the window: Thursday 22:00–06:00 is checked as Thursday at 05:00 on Friday, `DayBit(now.AddDays(-1).DayOfWeek)`.
->>>>>>> 9492aa463bd5615b5f2569ed2729a16f3ca0027b
