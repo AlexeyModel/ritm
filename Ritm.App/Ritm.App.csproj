@@ -10,10 +10,10 @@
     <ApplicationIcon>ritm.ico</ApplicationIcon>
     <AssemblyName>Ritm</AssemblyName>
     <RootNamespace>Ritm</RootNamespace>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Product>Ритм</Product>
     <Company>Ritm</Company>
-    <Description>Перерывы по расписанию. Трей Windows 10/11, .NET 9, встроенный SQLite.</Description>
+    <Description>Перерывы по расписанию. Трей Windows 10/11, .NET 9, встроенный SQLite. Русский, English, Deutsch.</Description>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
   </PropertyGroup>
   <ItemGroup>

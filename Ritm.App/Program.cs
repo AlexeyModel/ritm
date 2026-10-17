@@ -10,13 +10,14 @@ internal static class Program
         Application.SetCompatibleTextRenderingDefault(false);
         Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
         Application.ThreadException += (_, thread) => AppData.Log(thread.Exception);
+        Loc.Load();
 
         using var mutex = new Mutex(true, @"Local\Ritm.SingleInstance.v1", out var created);
         if (!created)
         {
             MessageBox.Show(
-                "Ритм уже запущен. Значок находится у часов, в трее.",
-                "Ритм",
+                Loc.T("app.already"),
+                Loc.T("app.name"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
             return;
@@ -35,6 +36,7 @@ internal static class Program
         try
         {
             using var database = new Database(AppData.DatabasePath());
+            Loc.UseDatabase(database);
             Application.Run(new TrayContext(database, startInTray));
         }
         catch (Exception ex)
@@ -42,7 +44,7 @@ internal static class Program
             AppData.Log(ex);
             MessageBox.Show(
                 ex.Message,
-                "Ритм — не удалось запустить",
+                Loc.T("app.failed"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }

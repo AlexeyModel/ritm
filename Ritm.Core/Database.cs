@@ -271,7 +271,7 @@ public sealed class Database : IDisposable
             {
                 var schedule = new WorkSchedule
                 {
-                    Name = "Рабочий день",
+                    Name = Loc.T("seed.workday"),
                     StartMinutes = 9 * 60,
                     EndMinutes = 19 * 60,
                     DaysMask = 0b0011111,
@@ -282,9 +282,9 @@ public sealed class Database : IDisposable
                 InsertCounter(new Counter
                 {
                     ScheduleId = schedule.Id,
-                    Name = "Перерыв",
+                    Name = Loc.T("default.break"),
                     IntervalMinutes = 45,
-                    Message = "Пора сделать перерыв. Встаньте, пройдитесь, посмотрите вдаль.",
+                    Message = Loc.T("seed.break.message"),
                     Enabled = true,
                     Sound = true,
                     SortOrder = 0,
@@ -292,9 +292,9 @@ public sealed class Database : IDisposable
                 InsertCounter(new Counter
                 {
                     ScheduleId = schedule.Id,
-                    Name = "Глаза",
+                    Name = Loc.T("seed.eyes"),
                     IntervalMinutes = 20,
-                    Message = "Отведите взгляд от экрана. Двадцать секунд смотрите вдаль.",
+                    Message = Loc.T("seed.eyes.message"),
                     Enabled = true,
                     Sound = true,
                     SortOrder = 1,
@@ -304,7 +304,7 @@ public sealed class Database : IDisposable
         SetSetting("seeded", "1");
     }
 
-    string? GetSetting(string key)
+    public string? GetSetting(string key)
     {
         using var command = _connection.CreateCommand();
         command.CommandText = "SELECT value FROM settings WHERE key = $key;";
@@ -312,7 +312,7 @@ public sealed class Database : IDisposable
         return command.ExecuteScalar() as string;
     }
 
-    void SetSetting(string key, string value)
+    public void SetSetting(string key, string value)
     {
         using var command = _connection.CreateCommand();
         command.CommandText = """

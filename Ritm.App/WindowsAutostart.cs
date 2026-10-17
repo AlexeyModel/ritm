@@ -16,7 +16,7 @@ static class WindowsAutostart
     public static void SetEnabled(bool enabled)
     {
         using var key = Registry.CurrentUser.CreateSubKey(RunKey, writable: true)
-            ?? throw new InvalidOperationException("Не удалось открыть автозагрузку Windows.");
+            ?? throw new InvalidOperationException(Loc.T("autostart.open.failed"));
         if (!enabled)
         {
             key.DeleteValue(ValueName, throwOnMissingValue: false);

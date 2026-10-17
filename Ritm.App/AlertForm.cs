@@ -45,10 +45,10 @@ sealed class AlertForm : Form
         body.AutoEllipsis = false;
 
         var buttons = new Panel { Dock = DockStyle.Fill, BackColor = Theme.Card };
-        var ok = Theme.MakeButton("Понятно", true);
-        ok.SetBounds(0, 6, 112, 32);
-        var later = Theme.MakeButton("Отложить на 5 мин", false);
-        later.SetBounds(122, 6, 168, 32);
+        var ok = UiText.Button("alert.ok", true);
+        ok.SetBounds(0, 6, 128, 32);
+        var later = UiText.Button("alert.snooze", false);
+        later.SetBounds(136, 6, 188, 32);
         ok.Click += (_, _) => Close();
         later.Click += (_, _) =>
         {

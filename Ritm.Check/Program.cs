@@ -149,5 +149,31 @@ if (failures.Count > 0)
     return 1;
 }
 
+var langPath = Path.Combine(Path.GetTempPath(), "ritm-lang-" + Guid.NewGuid().ToString("n") + ".db");
+using (var langDb = new Database(langPath))
+{
+    Expect(Loc.Language == AppLanguage.Ru, "default language is Russian");
+    Expect(Loc.T("menu.language") == "Язык", "russian language menu");
+    Expect(WindowClock.FormatDays(0b0011111) == "пн–пт", "russian weekdays");
+    Loc.Select(AppLanguage.En, langDb);
+    Expect(Loc.T("menu.language") == "Language", "english language menu");
+    Expect(WindowClock.FormatDays(0b0011111) == "Mon–Fri", "english weekdays");
+    Expect(WindowClock.FormatDuration(12) == "12 s", "english seconds");
+    Expect(langDb.GetSetting("language") == "en", "language stored");
+    Loc.Select(AppLanguage.De, langDb);
+    Expect(Loc.T("menu.language") == "Sprache", "german language menu");
+    Expect(WindowClock.FormatDays(0b1100000) == "Sa–So", "german weekend");
+    Expect(new Counter { Message = "" }.AlertMessage == "Zeit für eine Pause.", "german fallback message");
+    Loc.Select(AppLanguage.Ru, langDb);
+    Expect(Loc.T("days.every") == "каждый день", "language restored");
+}
+File.Delete(langPath);
+
+if (failures.Count > 0)
+{
+    Console.Error.WriteLine(string.Join(Environment.NewLine, failures));
+    return 1;
+}
+
 Console.WriteLine("ritm checks ok");
 return 0;

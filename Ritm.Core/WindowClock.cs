@@ -31,7 +31,7 @@ public static class WindowClock
     public static string FormatDuration(int seconds)
     {
         if (seconds < 0) seconds = 0;
-        if (seconds < 60) return $"{seconds} с";
+        if (seconds < 60) return $"{seconds} {Loc.T("unit.sec")}";
         int hours = seconds / 3600;
         int mins = (seconds % 3600) / 60;
         int secs = seconds % 60;
@@ -43,11 +43,20 @@ public static class WindowClock
 
     public static string FormatDays(int mask)
     {
-        if (mask == 0) return "дни не выбраны";
-        if (mask == 0b0011111) return "пн–пт";
-        if (mask == 0b1100000) return "сб–вс";
-        if ((mask & 0b1111111) == 0b1111111) return "каждый день";
-        string[] names = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
+        if (mask == 0) return Loc.T("days.none");
+        if (mask == 0b0011111) return Loc.T("days.weekdays");
+        if (mask == 0b1100000) return Loc.T("days.weekend");
+        if ((mask & 0b1111111) == 0b1111111) return Loc.T("days.every");
+        string[] names =
+        [
+            Loc.T("day.short.0"),
+            Loc.T("day.short.1"),
+            Loc.T("day.short.2"),
+            Loc.T("day.short.3"),
+            Loc.T("day.short.4"),
+            Loc.T("day.short.5"),
+            Loc.T("day.short.6"),
+        ];
         var parts = new List<string>(7);
         for (var i = 0; i < 7; i++)
         {

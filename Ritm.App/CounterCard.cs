@@ -48,9 +48,9 @@ sealed class CounterCard : UserControl
         grid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 72));
         grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 42));
-        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 62));
-        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 68));
-        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 92));
+        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 78));
+        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 78));
+        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 108));
         grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 34));
         grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
         grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 28));
@@ -72,16 +72,16 @@ sealed class CounterCard : UserControl
         };
         var unit = new Label
         {
-            Text = "мин",
             Dock = DockStyle.Fill,
             TextAlign = ContentAlignment.MiddleLeft,
             ForeColor = Theme.Muted,
             BackColor = Theme.Card,
             Font = Theme.Small,
         };
-        _enabled = Box("вкл");
-        _sound = Box("звук");
-        var remove = Theme.MakeButton("Удалить", false);
+        UiText.Bind(unit, "unit.min");
+        _enabled = Box("check.on");
+        _sound = Box("check.sound");
+        var remove = UiText.Button("button.delete", false);
         remove.Dock = DockStyle.Fill;
         remove.ForeColor = Theme.Clay;
 
@@ -99,7 +99,7 @@ sealed class CounterCard : UserControl
             BackColor = Theme.Card,
             Font = Theme.Small,
         };
-        var test = Theme.MakeButton("Проверить", false);
+        var test = UiText.Button("button.test", false);
         test.Dock = DockStyle.Fill;
 
         var track = new Panel { Dock = DockStyle.Fill, BackColor = Theme.Line, Margin = new Padding(0, 4, 0, 0) };
@@ -146,6 +146,7 @@ sealed class CounterCard : UserControl
             Push(true);
             TestRequested?.Invoke(Counter);
         };
+        Loc.Changed += ApplyCue;
     }
 
     public void RefreshProgress()
@@ -153,7 +154,11 @@ sealed class CounterCard : UserControl
         int limit = Counter.LimitSeconds;
         int elapsed = Math.Clamp(Counter.ElapsedSeconds, 0, limit);
         int left = Math.Max(0, limit - elapsed);
-        _progress.Text = $"прошло {WindowClock.FormatDuration(elapsed)} из {WindowClock.FormatDuration(limit)}   ·   ещё {WindowClock.FormatDuration(left)}";
+        _progress.Text = Loc.T(
+            "progress",
+            WindowClock.FormatDuration(elapsed),
+            WindowClock.FormatDuration(limit),
+            WindowClock.FormatDuration(left));
         if (_fill.Parent is { Width: > 0 } track)
         {
             int width = limit == 0 ? 0 : (int)Math.Round(track.Width * (elapsed / (double)limit));
@@ -164,8 +169,13 @@ sealed class CounterCard : UserControl
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
-        if (_message.IsHandleCreated)
-            SendMessage(_message.Handle, CueBanner, (IntPtr)1, "Сообщение, которое появится вместе со звуком");
+        ApplyCue();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing) Loc.Changed -= ApplyCue;
+        base.Dispose(disposing);
     }
 
     void Push(bool finalize)
@@ -175,7 +185,7 @@ sealed class CounterCard : UserControl
         if (name.Length == 0)
         {
             if (!finalize) return;
-            name = "Счётчик";
+            name = Loc.T("default.counter");
             _binding = true;
             _name.Text = name;
             _binding = false;
@@ -194,13 +204,23 @@ sealed class CounterCard : UserControl
         Edited?.Invoke();
     }
 
-    static CheckBox Box(string text) => new()
+    static CheckBox Box(string key)
     {
-        Text = text,
-        Dock = DockStyle.Fill,
-        ForeColor = Theme.Ink,
-        BackColor = Theme.Card,
-        Font = Theme.Small,
-        Margin = new Padding(0, 6, 0, 0),
-    };
+        var box = new CheckBox
+        {
+            Dock = DockStyle.Fill,
+            ForeColor = Theme.Ink,
+            BackColor = Theme.Card,
+            Font = Theme.Small,
+            Margin = new Padding(0, 6, 0, 0),
+        };
+        UiText.Bind(box, key);
+        return box;
+    }
+
+    void ApplyCue()
+    {
+        if (IsDisposed || !_message.IsHandleCreated) return;
+        SendMessage(_message.Handle, CueBanner, (IntPtr)1, Loc.T("cue.message"));
+    }
 }

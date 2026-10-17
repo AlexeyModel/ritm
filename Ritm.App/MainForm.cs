@@ -23,7 +23,7 @@ sealed class MainForm : Form
     readonly Label _clock = new();
     readonly Label _status = new();
     readonly Button _pause;
-    readonly ToolStripMenuItem _autostartMenu = new("Автозапуск при входе в Windows");
+    readonly ToolStripMenuItem _autostartMenu = new();
 
     WorkSchedule? _selected;
     bool _binding;
@@ -39,16 +39,18 @@ sealed class MainForm : Form
     public event Action<bool>? PauseStateChanged;
     public event Action? HideToTrayHint;
 
+    public bool IsPaused => _paused;
+
     public MainForm(Database database)
     {
         _database = database;
         _schedules = database.LoadAll();
-        _pause = Theme.MakeButton("Пауза", false);
+        _pause = Theme.MakeButton(Loc.T("button.pause"), false);
         _timer = new System.Windows.Forms.Timer { Interval = 1000 };
         _timer.Tick += OnTick;
 
         DoubleBuffered = true;
-        Text = "Ритм";
+        Text = Loc.T("app.name");
         Font = Theme.Ui;
         BackColor = Theme.Bg;
         ForeColor = Theme.Ink;
@@ -81,7 +83,7 @@ sealed class MainForm : Form
     public void TogglePause()
     {
         _paused = !_paused;
-        _pause.Text = _paused ? "Продолжить" : "Пауза";
+        _pause.Text = _paused ? Loc.T("button.resume") : Loc.T("button.pause");
         _stamp = Stopwatch.GetTimestamp();
         _bank = 0;
         PauseStateChanged?.Invoke(_paused);
@@ -171,20 +173,20 @@ sealed class MainForm : Form
         var titles = new Panel { Dock = DockStyle.Fill, BackColor = Theme.Bg };
         var title = new Label
         {
-            Text = "Ритм",
             Dock = DockStyle.Top,
             Height = 32,
             Font = Theme.Title,
             ForeColor = Theme.Ink,
         };
+        UiText.Bind(title, "app.name");
         var subtitle = new Label
         {
-            Text = "Режим — окно времени. Внутри него несколько счётчиков, каждый со своим сообщением.",
             Dock = DockStyle.Top,
             Height = 22,
             ForeColor = Theme.Muted,
             Font = Theme.Small,
         };
+        UiText.Bind(subtitle, "subtitle");
         titles.Controls.Add(subtitle);
         titles.Controls.Add(title);
         header.Controls.Add(titles);
@@ -196,7 +198,7 @@ sealed class MainForm : Form
         _status.Padding = new Padding(16, 0, 8, 0);
         _status.ForeColor = Theme.Muted;
         _status.Font = Theme.Small;
-        var data = Theme.MakeButton("Папка данных", false);
+        var data = UiText.Button("button.data", false);
         data.Dock = DockStyle.Right;
         data.Width = 140;
         data.Click += (_, _) => OpenDataFolder();
@@ -208,10 +210,10 @@ sealed class MainForm : Form
         var right = new Panel { Dock = DockStyle.Fill, BackColor = Theme.Bg };
 
         var buttons = new Panel { Dock = DockStyle.Bottom, Height = 44, BackColor = Theme.Panel };
-        var addMode = Theme.MakeButton("Новый режим", true);
+        var addMode = UiText.Button("button.new.schedule", true);
         addMode.Dock = DockStyle.Left;
         addMode.Width = 148;
-        var deleteMode = Theme.MakeButton("Удалить", false);
+        var deleteMode = UiText.Button("button.delete", false);
         deleteMode.Dock = DockStyle.Right;
         deleteMode.Width = 104;
         deleteMode.ForeColor = Theme.Clay;
@@ -222,13 +224,13 @@ sealed class MainForm : Form
 
         var caption = new Label
         {
-            Text = "РЕЖИМЫ",
             Dock = DockStyle.Top,
             Height = 22,
             ForeColor = Theme.Muted,
             Font = Theme.Small,
             BackColor = Theme.Panel,
         };
+        UiText.Bind(caption, "caption.schedules");
         _list.Dock = DockStyle.Fill;
         _list.BorderStyle = BorderStyle.None;
         _list.DrawMode = DrawMode.OwnerDrawFixed;
@@ -248,8 +250,8 @@ sealed class MainForm : Form
         _empty.Dock = DockStyle.Fill;
         _empty.TextAlign = ContentAlignment.MiddleCenter;
         _empty.ForeColor = Theme.Muted;
-        _empty.Text = "Добавьте режим — например, с 9:00 до 19:00.\nВнутри него заведите счётчики в минутах.";
         _empty.Visible = false;
+        UiText.Bind(_empty, "empty");
 
         BuildEditor();
         right.Controls.Add(_editor);
@@ -264,7 +266,9 @@ sealed class MainForm : Form
         Controls.Add(rule);
         Controls.Add(header);
 
-        var windowMenu = new ToolStripMenuItem("Окно");
+        var windowMenu = new ToolStripMenuItem();
+        UiText.Bind(windowMenu, "menu.window");
+        UiText.Bind(_autostartMenu, "menu.autostart");
         _autostartMenu.Click += (_, _) =>
         {
             try
@@ -275,7 +279,7 @@ sealed class MainForm : Form
             {
                 AppData.Log(ex);
                 RefreshAutostartCheck();
-                MessageBox.Show(ex.Message, "Ритм", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(ex.Message, Loc.T("app.name"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         };
         windowMenu.DropDownOpening += (_, _) => RefreshAutostartCheck();
@@ -288,9 +292,12 @@ sealed class MainForm : Form
             Dock = DockStyle.Top,
         };
         bar.Items.Add(windowMenu);
+        LanguageMenu.Add(bar.Items, _database);
         MainMenuStrip = bar;
         RefreshAutostartCheck();
         Controls.Add(bar);
+        UiText.Bind(this, "app.name");
+        Loc.Changed += OnLanguageChanged;
     }
 
     void BuildEditor()
@@ -304,14 +311,14 @@ sealed class MainForm : Form
         var dayRow = Row(40);
         var optionRow = Row(36);
 
-        var nameLabel = Inline("Режим", 64);
+        var nameLabel = Inline("label.schedule", 88);
         _name.Dock = DockStyle.Fill;
-        _enabled.Text = "Включён";
         _enabled.Dock = DockStyle.Right;
-        _enabled.Width = 100;
+        _enabled.Width = 120;
         _enabled.TextAlign = ContentAlignment.MiddleRight;
         _enabled.ForeColor = Theme.Ink;
         _enabled.BackColor = Theme.Bg;
+        UiText.Bind(_enabled, "check.enabled");
         _enabled.CheckedChanged += (_, _) => SaveSchedule(false);
         _name.TextChanged += (_, _) => SaveSchedule(false);
         _name.Leave += (_, _) => SaveSchedule(true);
@@ -319,18 +326,18 @@ sealed class MainForm : Form
         nameRow.Controls.Add(_enabled);
         nameRow.Controls.Add(nameLabel);
 
-        var fromLabel = Inline("С", 24);
-        var toLabel = Inline("до", 32);
+        var fromLabel = Inline("label.from", 52);
+        var toLabel = Inline("label.to", 36);
         _from.Dock = DockStyle.Left;
         _to.Dock = DockStyle.Left;
         _from.ValueChanged += (_, _) => SaveSchedule(false);
         _to.ValueChanged += (_, _) => SaveSchedule(false);
-        var resetButton = Theme.MakeButton("Сбросить счётчики", false);
+        var resetButton = UiText.Button("button.reset.counters", false);
         resetButton.Dock = DockStyle.Right;
-        resetButton.Width = 168;
+        resetButton.Width = 200;
         resetButton.Click += (_, _) => ResetCounters();
         toLabel.Padding = new Padding(10, 0, 0, 0);
-        toLabel.Width = 42;
+        toLabel.Width = 48;
         timeRow.Controls.Add(resetButton);
         timeRow.Controls.Add(_to);
         timeRow.Controls.Add(toLabel);
@@ -344,34 +351,33 @@ sealed class MainForm : Form
             WrapContents = false,
             BackColor = Theme.Bg,
         };
-        string[] dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-        for (var i = 0; i < dayNames.Length; i++)
+        for (var i = 0; i < 7; i++)
         {
             var box = new CheckBox
             {
-                Text = dayNames[i],
                 AutoSize = true,
                 Margin = new Padding(0, 8, 16, 0),
                 ForeColor = Theme.Ink,
                 BackColor = Theme.Bg,
                 Font = Theme.Ui,
             };
+            UiText.Bind(box, $"day.{i}");
             box.CheckedChanged += (_, _) => SaveSchedule(false);
             _days[i] = box;
             dayFlow.Controls.Add(box);
         }
         dayRow.Controls.Add(dayFlow);
 
-        _reset.Text = "Обнулять в начале окна";
         _reset.AutoSize = false;
-        _reset.Width = 230;
+        _reset.Width = 360;
         _reset.Dock = DockStyle.Left;
         _reset.TextAlign = ContentAlignment.MiddleLeft;
         _reset.ForeColor = Theme.Ink;
         _reset.BackColor = Theme.Bg;
+        UiText.Bind(_reset, "check.reset.window");
         _reset.CheckedChanged += (_, _) => SaveSchedule(false);
         _windowState.Dock = DockStyle.Right;
-        _windowState.Width = 120;
+        _windowState.Width = 150;
         _windowState.TextAlign = ContentAlignment.MiddleRight;
         _windowState.Font = Theme.UiBold;
         _windowState.ForeColor = Theme.Pine;
@@ -392,14 +398,14 @@ sealed class MainForm : Form
         var counterHead = new Panel { Dock = DockStyle.Top, Height = 42, BackColor = Theme.Bg };
         var counterTitle = new Label
         {
-            Text = "Счётчики",
             Dock = DockStyle.Left,
             Width = 140,
             TextAlign = ContentAlignment.MiddleLeft,
             Font = Theme.UiBold,
             ForeColor = Theme.Ink,
         };
-        var addCounter = Theme.MakeButton("Новый счётчик", true);
+        UiText.Bind(counterTitle, "label.counters");
+        var addCounter = UiText.Button("button.new.counter", true);
         addCounter.Dock = DockStyle.Right;
         addCounter.Width = 160;
         addCounter.Click += (_, _) => AddCounter();
@@ -427,15 +433,27 @@ sealed class MainForm : Form
         Padding = new Padding(0, 4, 0, 4),
     };
 
-    static Label Inline(string text, int width) => new()
+    static Label Inline(string key, int width)
     {
-        Text = text,
-        Dock = DockStyle.Left,
-        Width = width,
-        TextAlign = ContentAlignment.MiddleLeft,
-        ForeColor = Theme.Muted,
-        Font = Theme.Small,
-    };
+        var label = new Label
+        {
+            Dock = DockStyle.Left,
+            Width = width,
+            TextAlign = ContentAlignment.MiddleLeft,
+            ForeColor = Theme.Muted,
+            Font = Theme.Small,
+        };
+        UiText.Bind(label, key);
+        return label;
+    }
+
+    void OnLanguageChanged()
+    {
+        if (IsDisposed) return;
+        _pause.Text = _paused ? Loc.T("button.resume") : Loc.T("button.pause");
+        UpdateHint();
+        RefreshLive();
+    }
 
     void LoadList()
     {
@@ -481,7 +499,7 @@ sealed class MainForm : Form
         if (name.Length == 0)
         {
             if (!finalize) return;
-            name = "Без названия";
+            name = Loc.T("default.untitled");
             _binding = true;
             _name.Text = name;
             _binding = false;
@@ -509,20 +527,20 @@ sealed class MainForm : Form
         if (_selected == null) return;
         var schedule = _selected;
         if (schedule.DaysMask == 0)
-            _hint.Text = "Дни не выбраны — режим не включится.";
+            _hint.Text = Loc.T("hint.no.days");
         else if (schedule.StartMinutes == schedule.EndMinutes)
-            _hint.Text = "Начало и конец совпали — окно пустое.";
+            _hint.Text = Loc.T("hint.empty.window");
         else if (schedule.StartMinutes > schedule.EndMinutes)
-            _hint.Text = "Через полночь.  " + WindowClock.FormatDays(schedule.DaysMask);
+            _hint.Text = Loc.T("hint.overnight", WindowClock.FormatDays(schedule.DaysMask));
         else
-            _hint.Text = WindowClock.FormatDays(schedule.DaysMask) + "  ·  счётчики идут только здесь";
+            _hint.Text = Loc.T("hint.inside", WindowClock.FormatDays(schedule.DaysMask));
     }
 
     void AddSchedule()
     {
         var schedule = new WorkSchedule
         {
-            Name = "Новый режим",
+            Name = Loc.T("default.new.schedule"),
             StartMinutes = 9 * 60,
             EndMinutes = 19 * 60,
             DaysMask = 0b0011111,
@@ -540,8 +558,8 @@ sealed class MainForm : Form
         if (_selected == null) return;
         var schedule = _selected;
         var answer = MessageBox.Show(
-            $"Удалить режим «{schedule.Name}» и все его счётчики?",
-            "Ритм",
+            Loc.T("confirm.delete", schedule.Name),
+            Loc.T("app.name"),
             MessageBoxButtons.YesNo,
             MessageBoxIcon.Question);
         if (answer != DialogResult.Yes) return;
@@ -562,9 +580,9 @@ sealed class MainForm : Form
         var counter = new Counter
         {
             ScheduleId = _selected.Id,
-            Name = "Перерыв",
+            Name = Loc.T("default.break"),
             IntervalMinutes = 45,
-            Message = "Пора сделать перерыв. Встаньте и отойдите от стола.",
+            Message = Loc.T("default.break.message"),
             Enabled = true,
             Sound = true,
             SortOrder = _selected.Counters.Count,
@@ -676,7 +694,7 @@ sealed class MainForm : Form
         {
             _timer.Stop();
             AppData.Log(ex);
-            _status.Text = "Сбой отсчёта. Подробности в error.log в папке данных. Перезапустите Ритм.";
+            _status.Text = Loc.T("error.tick");
         }
     }
 
@@ -720,8 +738,8 @@ sealed class MainForm : Form
 
         if (_paused)
         {
-            tip = "Ритм · пауза";
-            status = "Пауза. Окна не проверяются, счётчики стоят.";
+            tip = Loc.T("status.pause.tip");
+            status = Loc.T("status.pause");
             return;
         }
 
@@ -748,21 +766,21 @@ sealed class MainForm : Form
 
         if (active == 0)
         {
-            tip = "Ритм · вне окна";
-            status = $"{now:HH:mm:ss}   ·   Вне всех режимов — счётчики стоят.";
+            tip = Loc.T("status.outside.tip");
+            status = Loc.T("status.outside", now.ToString("HH:mm:ss"));
             return;
         }
 
         if (nearest == null || owner == null)
         {
-            tip = "Ритм · нет счётчиков";
-            status = $"{now:HH:mm:ss}   ·   Окно открыто, включённых счётчиков нет.";
+            tip = Loc.T("status.none.tip");
+            status = Loc.T("status.none", now.ToString("HH:mm:ss"));
             return;
         }
 
         var remainText = WindowClock.FormatDuration(left);
-        tip = $"Ритм · {nearest.Name} через {remainText}";
-        status = $"{now:HH:mm:ss}   ·   {owner.Name}: «{nearest.Name}» через {remainText}";
+        tip = Loc.T("status.next.tip", nearest.Name, remainText);
+        status = Loc.T("status.next", now.ToString("HH:mm:ss"), owner.Name, nearest.Name, remainText);
     }
 
     void PaintWindowState(DateTime now)
@@ -775,22 +793,22 @@ sealed class MainForm : Form
 
         if (!_selected.Enabled)
         {
-            _windowState.Text = "выключен";
+            _windowState.Text = Loc.T("state.off");
             _windowState.ForeColor = Theme.Muted;
         }
         else if (_paused)
         {
-            _windowState.Text = "пауза";
+            _windowState.Text = Loc.T("state.pause");
             _windowState.ForeColor = Theme.Muted;
         }
         else if (WindowClock.Contains(_selected, now))
         {
-            _windowState.Text = "сейчас идёт";
+            _windowState.Text = Loc.T("state.live");
             _windowState.ForeColor = Theme.Pine;
         }
         else
         {
-            _windowState.Text = "вне окна";
+            _windowState.Text = Loc.T("state.outside");
             _windowState.ForeColor = Theme.Muted;
         }
     }

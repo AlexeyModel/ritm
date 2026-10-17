@@ -28,5 +28,5 @@ public sealed class Counter
     public int LimitSeconds => Math.Max(1, IntervalMinutes) * 60;
 
     public string AlertMessage =>
-        string.IsNullOrWhiteSpace(Message) ? "Пора сделать перерыв." : Message.Trim();
+        string.IsNullOrWhiteSpace(Message) ? Loc.T("alert.default") : Message.Trim();
 }
