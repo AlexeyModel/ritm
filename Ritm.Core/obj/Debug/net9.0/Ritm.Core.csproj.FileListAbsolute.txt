@@ -1,0 +1,13 @@
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\bin\Debug\net9.0\Ritm.Core.deps.json
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\bin\Debug\net9.0\Ritm.Core.dll
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\bin\Debug\net9.0\Ritm.Core.pdb
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\obj\Debug\net9.0\Ritm.Core.csproj.AssemblyReference.cache
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\obj\Debug\net9.0\Ritm.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\obj\Debug\net9.0\Ritm.Core.AssemblyInfoInputs.cache
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\obj\Debug\net9.0\Ritm.Core.AssemblyInfo.cs
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\obj\Debug\net9.0\Ritm.Core.csproj.CoreCompileInputs.cache
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\obj\Debug\net9.0\Ritm.Core.dll
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\obj\Debug\net9.0\refint\Ritm.Core.dll
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\obj\Debug\net9.0\Ritm.Core.pdb
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\obj\Debug\net9.0\ref\Ritm.Core.dll
+C:\Users\absmo\projects\2026-codding\RitmApp-риложение-циклический-таймер\2026-10-16-v1-1-build-src-readme\Ritm-tray-source\Ritm.Core\obj\Debug\net9.0\Ritm.Core.csproj.Up2Date

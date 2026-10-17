@@ -1,0 +1,158 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\absmo\\projects\\2026-codding\\RitmApp-риложение-циклический-таймер\\2026-10-16-v1-1-build-src-readme\\Ritm-tray-source\\Ritm.Check\\Ritm.Check.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\absmo\\projects\\2026-codding\\RitmApp-риложение-циклический-таймер\\2026-10-16-v1-1-build-src-readme\\Ritm-tray-source\\Ritm.Check\\Ritm.Check.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\absmo\\projects\\2026-codding\\RitmApp-риложение-циклический-таймер\\2026-10-16-v1-1-build-src-readme\\Ritm-tray-source\\Ritm.Check\\Ritm.Check.csproj",
+        "projectName": "Ritm.Check",
+        "projectPath": "C:\\Users\\absmo\\projects\\2026-codding\\RitmApp-риложение-циклический-таймер\\2026-10-16-v1-1-build-src-readme\\Ritm-tray-source\\Ritm.Check\\Ritm.Check.csproj",
+        "packagesPath": "C:\\Users\\absmo\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\absmo\\projects\\2026-codding\\RitmApp-риложение-циклический-таймер\\2026-10-16-v1-1-build-src-readme\\Ritm-tray-source\\Ritm.Check\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\absmo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "framework": "net9.0",
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "C:\\Users\\absmo\\projects\\2026-codding\\RitmApp-риложение-циклический-таймер\\2026-10-16-v1-1-build-src-readme\\Ritm-tray-source\\Ritm.Core\\Ritm.Core.csproj": {
+                "projectPath": "C:\\Users\\absmo\\projects\\2026-codding\\RitmApp-риложение-циклический-таймер\\2026-10-16-v1-1-build-src-readme\\Ritm-tray-source\\Ritm.Core\\Ritm.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "framework": "net9.0",
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.319/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\absmo\\projects\\2026-codding\\RitmApp-риложение-циклический-таймер\\2026-10-16-v1-1-build-src-readme\\Ritm-tray-source\\Ritm.Core\\Ritm.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\absmo\\projects\\2026-codding\\RitmApp-риложение-циклический-таймер\\2026-10-16-v1-1-build-src-readme\\Ritm-tray-source\\Ritm.Core\\Ritm.Core.csproj",
+        "projectName": "Ritm.Core",
+        "projectPath": "C:\\Users\\absmo\\projects\\2026-codding\\RitmApp-риложение-циклический-таймер\\2026-10-16-v1-1-build-src-readme\\Ritm-tray-source\\Ritm.Core\\Ritm.Core.csproj",
+        "packagesPath": "C:\\Users\\absmo\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\absmo\\projects\\2026-codding\\RitmApp-риложение-циклический-таймер\\2026-10-16-v1-1-build-src-readme\\Ritm-tray-source\\Ritm.Core\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\absmo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "framework": "net9.0",
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "framework": "net9.0",
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.Data.Sqlite": {
+              "target": "Package",
+              "version": "[9.0.8, )"
+            },
+            "SQLitePCLRaw.bundle_e_sqlite3": {
+              "target": "Package",
+              "version": "[2.1.10, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.319/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

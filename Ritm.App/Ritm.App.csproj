@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>ritm.ico</ApplicationIcon>
+    <AssemblyName>Ritm</AssemblyName>
+    <RootNamespace>Ritm</RootNamespace>
+    <Version>1.1.0</Version>
+    <Product>Ритм</Product>
+    <Company>Ritm</Company>
+    <Description>Перерывы по расписанию. Трей Windows 10/11, .NET 9, встроенный SQLite.</Description>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ritm.Core\Ritm.Core.csproj" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.10" />
+  </ItemGroup>
+</Project>
