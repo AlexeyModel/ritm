@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-# Ritm
-=======
 # Ritm — scheduled breaks
->>>>>>> 9492aa463bd5615b5f2569ed2729a16f3ca0027b
 
 Scheduled breaks for a working day.
 
@@ -19,7 +15,6 @@ There is no account, no installer, and no shared service. Each copy keeps its ow
 
 Ritm is for a person who works to a clock and wants the pause to belong to that clock.
 
-<<<<<<< HEAD
 - The working time is a schedule: a from–until range and the weekdays it applies to.
 - Inside one schedule there can be several counters. Each counter has its own interval, in minutes, and its own message.
 - Outside the schedule the counters do not move. Closing or minimising the window does not stop them.
